@@ -1,0 +1,2 @@
+name is : ['sejoo'] , your number phone is : ['1313531513'] , your grades is : {'math': 20.0, 'AP': 18.6, 'BP': 16.8, 'data': 16.58, 'english': 20.0} , your student number is : ['165168615'] , your average is : 18.396
+name is : sejoo , your number phone is : 09929292 , your grades is : {'math': 20.0, 'AP': 18.6, 'BP': 16.8, 'data': 16.5, 'english': 20.0} , your student number is : 665165161 , your average is : 18.380000000000003

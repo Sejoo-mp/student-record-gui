@@ -1,0 +1,78 @@
+import tkinter as tk
+from tkinter import messagebox
+
+COURSES = ["math", "AP", "BP", "data", "english"]
+
+class Student:
+    def __init__(self, name, number_phone, grades, student_number):
+        self.name = name
+        self.number_phone = number_phone
+        self.grades = grades
+        self.student_number = student_number
+
+    def average(self):
+        return sum(self.grades.values()) / len(self.grades)
+
+    def get_Academic_Record(self):
+        return f"name is : {self.name} , your number phone is : {self.number_phone} , your grades is : {self.grades} , your student number is : {self.student_number} , your average is : {self.average()}"
+
+class StudentApp:
+    def __init__(self, root):
+        self.root = root
+        root.title("Student Record")
+
+        tk.Label(root, text="Name:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        self.name_entry = tk.Entry(root, width=30)
+        self.name_entry.grid(row=0, column=1, padx=10)
+
+        tk.Label(root, text="Phone:").grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        self.phone_entry = tk.Entry(root, width=30)
+        self.phone_entry.grid(row=1, column=1, padx=10)
+
+        tk.Label(root, text="Student number:").grid(row=2, column=0, sticky="w", padx=10, pady=5)
+        self.number_entry = tk.Entry(root, width=30)
+        self.number_entry.grid(row=2, column=1, padx=10)
+
+        self.grade_entries = {}
+        for i, course in enumerate(COURSES):
+            tk.Label(root, text=f"{course} grade:").grid(row=3 + i, column=0, sticky="w", padx=10, pady=5)
+            entry = tk.Entry(root, width=30)
+            entry.grid(row=3 + i, column=1, padx=10)
+            self.grade_entries[course] = entry
+
+        tk.Button(root, text="Submit", command=self.submit).grid(row=8, column=0, columnspan=2, pady=10)
+
+    def submit(self):
+        name = self.name_entry.get().strip()
+        phone = self.phone_entry.get().strip()
+        student_number = self.number_entry.get().strip()
+
+        if not name or not phone or not student_number:
+            messagebox.showerror("Error", "Name, phone and student number can not be empty!")
+            return
+
+        grades = {}
+        for course, entry in self.grade_entries.items():
+            try:
+                score = float(entry.get())
+            except ValueError:
+                messagebox.showerror("Error", f"{course}: please enter a number!")
+                return
+            if not (0 <= score <= 20):
+                messagebox.showerror("Error", f"{course}: grade must be between 0 and 20!")
+                return
+            grades[course] = score
+
+        s = Student(name, phone, grades, student_number)
+        record = s.get_Academic_Record()
+
+        with open("student.txt", "a", encoding="utf-8") as f:
+            f.write(record + "\n")
+
+        messagebox.showinfo("Saved", record)
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    StudentApp(root)
+    root.mainloop()
