@@ -1,0 +1,2 @@
+printf "student.txt\n__pycache__/\n" > .gitignore
+git rm --cached student.txt
