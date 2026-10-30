@@ -4,7 +4,8 @@ from tkinter import messagebox
 COURSES = ["math", "AP", "BP", "data", "english"]
 
 class Student:
-    def __init__(self, name, number_phone, grades, student_number):
+    def __init__(self , id, name, number_phone, grades, student_number):
+        self.id = id
         self.name = name
         self.number_phone = number_phone
         self.grades = grades
@@ -14,40 +15,90 @@ class Student:
         return sum(self.grades.values()) / len(self.grades)
 
     def get_Academic_Record(self):
-        return f"name is : {self.name} , your number phone is : {self.number_phone} , your grades is : {self.grades} , your student number is : {self.student_number} , your average is : {self.average()}"
+        return f"id : {self.id} , name is : {self.name} , your number phone is : {self.number_phone} , your grades is : {self.grades} , your student number is : {self.student_number} , your average is : {self.average()}"
+
+
+class MenuOfSelect:
+    def __init__(self, root):
+        self.root = root
+        root.title("Menu")
+        self.Extend_button = tk.Button(root, text="Extend Student", command=self.open_form)
+        self.Extend_button.grid(row=0, column=0, rowspan=2,padx=5, pady=10)
+        
+        self.search_button = tk.Button(root, text="Search", command=self.search)
+        self.search_button.grid(row=0, column=1, rowspan=2, padx=5, pady=10)
+        
+    def open_form(self):
+        StudentApp(self.root) 
+        self.Extend_button.grid_remove()
+        self.search_button.grid_remove()
+
+    def search(self):
+        root.title("Search Menu")
+        self.Extend_button.grid_remove()
+        self.search_button.grid_remove()
+        tk.Label(self.root, text="Id:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        self.Id_entry = tk.Entry(self.root, width=30)
+        self.Id_entry.grid(row=0, column=1, padx=10)
+        tk.Button(self.root, text="Search", command=self.do_search).grid(row=1, column=0, columnspan=2, pady=10)
+        
+    def do_search(self):
+        target_id = self.Id_entry.get().strip()
+
+        if not target_id:
+            messagebox.showerror("Error", "Id can not be empty!")
+            return
+
+        try:
+            with open("student.txt", "r", encoding="utf-8") as f:
+                for line in f:
+                    line = line.strip()
+                    if line.startswith(f"id : {target_id} ,"):
+                        messagebox.showinfo("Result", line)
+                        return
+        except FileNotFoundError:
+            messagebox.showerror("Error", "student.txt not found!")
+            return
+
+        messagebox.showerror("Not found", f"No student with id {target_id}")
 
 class StudentApp:
     def __init__(self, root):
         self.root = root
         root.title("Student Record")
 
-        tk.Label(root, text="Name:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        tk.Label(root, text="Id:").grid(row=0, column=0, sticky="w", padx=10, pady=5)
+        self.Id_entry = tk.Entry(root, width=30)
+        self.Id_entry.grid(row=0, column=1, padx=10)
+        
+        tk.Label(root, text="Name:").grid(row=1, column=0, sticky="w", padx=10, pady=5)
         self.name_entry = tk.Entry(root, width=30)
-        self.name_entry.grid(row=0, column=1, padx=10)
+        self.name_entry.grid(row=1, column=1, padx=10)
 
-        tk.Label(root, text="Phone:").grid(row=1, column=0, sticky="w", padx=10, pady=5)
+        tk.Label(root, text="Phone:").grid(row=2, column=0, sticky="w", padx=10, pady=5)
         self.phone_entry = tk.Entry(root, width=30)
-        self.phone_entry.grid(row=1, column=1, padx=10)
+        self.phone_entry.grid(row=2, column=1, padx=10)
 
-        tk.Label(root, text="Student number:").grid(row=2, column=0, sticky="w", padx=10, pady=5)
+        tk.Label(root, text="Student number:").grid(row=3, column=0, sticky="w", padx=10, pady=5)
         self.number_entry = tk.Entry(root, width=30)
-        self.number_entry.grid(row=2, column=1, padx=10)
+        self.number_entry.grid(row=3, column=1, padx=10)
 
         self.grade_entries = {}
         for i, course in enumerate(COURSES):
-            tk.Label(root, text=f"{course} grade:").grid(row=3 + i, column=0, sticky="w", padx=10, pady=5)
+            tk.Label(root, text=f"{course} grade:").grid(row=4 + i, column=0, sticky="w", padx=10, pady=5)
             entry = tk.Entry(root, width=30)
-            entry.grid(row=3 + i, column=1, padx=10)
+            entry.grid(row=4 + i, column=1, padx=10)
             self.grade_entries[course] = entry
 
-        tk.Button(root, text="Submit", command=self.submit).grid(row=8, column=0, columnspan=2, pady=10)
+        tk.Button(root, text="Submit", command=self.submit).grid(row=9, column=0, columnspan=2, pady=10)
 
     def submit(self):
+        id = self.Id_entry.get().strip()
         name = self.name_entry.get().strip()
         phone = self.phone_entry.get().strip()
         student_number = self.number_entry.get().strip()
 
-        if not name or not phone or not student_number:
+        if not id or not name or not phone or not student_number:
             messagebox.showerror("Error", "Name, phone and student number can not be empty!")
             return
 
@@ -63,7 +114,7 @@ class StudentApp:
                 return
             grades[course] = score
 
-        s = Student(name, phone, grades, student_number)
+        s = Student(id,name, phone, grades, student_number)
         record = s.get_Academic_Record()
 
         with open("student.txt", "a", encoding="utf-8") as f:
@@ -74,5 +125,5 @@ class StudentApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    StudentApp(root)
+    MenuOfSelect(root)
     root.mainloop()
